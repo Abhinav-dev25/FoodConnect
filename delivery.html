@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Acknowledgement</title>
+    <link rel="stylesheet" href="home.css"> <!-- Using your home.css for Navbar styling -->
+</head>
+<body>
+
+<!-- Navbar Starts -->
+<header>
+    <div class="logo">Food <b style="color: #06C167;">Connect</b></div>
+    <div class="hamburger">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+    <nav class="nav-bar">
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="profile.php">Profile</a></li>
+            <li><a href="explore.html">Explore</a></li>
+        </ul>
+    </nav>
+</header>
+
+<script>
+    hamburger = document.querySelector(".hamburger");
+    hamburger.onclick = function() {
+        navBar = document.querySelector(".nav-bar");
+        navBar.classList.toggle("active");
+    }
+</script>
+<!-- Navbar Ends -->
+
+<style>
+    .itm {
+        background-color: white;
+        display: grid;
+        padding: 20px;
+    }
+    .itm img {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    p {
+        text-align: center;
+        font-size: 30px;
+        color: black;
+        margin-top: 50px;
+    }
+    a {
+        text-decoration: underline;
+    }
+    @media (max-width: 767px) {
+        .itm { }
+    }
+</style>
+
+<div class="itm">
+    <p>"Thank you! Your donation will be collected and delivered to the needy immediately."</p>
+    <img src="img/delivery.gif" alt="Delivery Animation" width="400" height="400">
+    <p style="text-align: center;"><a href="home.html">Return to Home Page</a></p>
+</div>
+
+</body>
+</html>

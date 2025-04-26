@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Explore Nearby Food Donors</title>
+    <link rel="stylesheet" href="home.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .donor-card {
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar Starts -->
+<header>
+    <div class="logo">Food <b style="color: #06C167;">Connect</b></div>
+    <div class="hamburger">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+    <nav class="nav-bar">
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="profile.php">Profile</a></li>
+            <li><a href="explore.html" class="active">Explore</a></li>
+        </ul>
+    </nav>
+</header>
+
+<script>
+    hamburger = document.querySelector(".hamburger");
+    hamburger.onclick = function() {
+        navBar = document.querySelector(".nav-bar");
+        navBar.classList.toggle("active");
+    }
+</script>
+<!-- Navbar Ends -->
+
+<h1>Nearby Food Donors (within 10km)</h1>
+
+<div id="map"></div>
+
+<div id="donorList">
+    Loading nearby donors...
+</div>
+
+<script>
+    let map;
+
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of earth in KM
+        const dLat = (lat2 - lat1) * (Math.PI/180);
+        const dLon = (lon2 - lon1) * (Math.PI/180);
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * (Math.PI/180)) * Math.cos(lat2 * (Math.PI/180)) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+        return distance;
+    }
+
+    function initMap(userLat, userLng) {
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: userLat, lng: userLng },
+            zoom: 13,
+        });
+
+        new google.maps.Marker({
+            position: { lat: userLat, lng: userLng },
+            map: map,
+            label: "You",
+        });
+
+        // Fetch donors from server
+        fetch('fetch_donors.php')
+        .then(response => response.json())
+        .then(donors => {
+            const donorListDiv = document.getElementById('donorList');
+            donorListDiv.innerHTML = '';
+
+            donors.forEach(donor => {
+                const distance = getDistance(userLat, userLng, parseFloat(donor.latitude), parseFloat(donor.longitude));
+                if (distance <= 10) {
+                    const card = document.createElement('div');
+                    card.className = "donor-card";
+                    card.innerHTML = `
+                        <h3>${donor.name}</h3>
+                        <p><b>Food:</b> ${donor.food} (${donor.quantity})</p>
+                        <p><b>Contact:</b> ${donor.phoneno}</p>
+                        <p><b>Distance:</b> ${distance.toFixed(2)} km</p>
+                    `;
+                    donorListDiv.appendChild(card);
+
+                    new google.maps.Marker({
+                        position: { lat: parseFloat(donor.latitude), lng: parseFloat(donor.longitude) },
+                        map: map,
+                        label: "D",
+                        title: donor.name
+                    });
+                }
+            });
+
+            if (donorListDiv.innerHTML.trim() === '') {
+                donorListDiv.innerHTML = "<p>No donors found within 10 km radius.</p>";
+            }
+        });
+    }
+
+    function getUserLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                initMap(position.coords.latitude, position.coords.longitude);
+            }, error => {
+                alert("Error getting location. Please allow location access.");
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    getUserLocation();
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy6-shnAAQJFhuP73ugj4W4VFNKS5DKOg"></script>
+
+</body>
+</html>
